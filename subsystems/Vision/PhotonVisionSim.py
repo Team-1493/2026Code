@@ -52,7 +52,10 @@ class PVisionSim(Subsystem):
                  PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, self.dummyCam,robotToCamera)
             
             self.photonEstimator.multiTagFallbackStrategy=PoseStrategy.LOWEST_AMBIGUITY
-            self.targetVisible = False
+            # is there a visible target in the currently read results, set to zero if no new result!           
+            self.targetVisible = False   
+            # does the camera see a target, value doesn't change if no new result !            
+            self.hasTarget = False  
 
 
     def simulationPeriodic(self):
@@ -65,38 +68,56 @@ class PVisionSim(Subsystem):
             length=len(results)
             self.targetVisible = False
             if len(results) > 0:
+                self.hasTarget = False
                 result = results[-1]  # take the most recent result the camera had
                 length=len(result.getTargets())
                 rawFid = []
                 avg_dist=0
+                avg_area = 0
                 for target in result.getTargets():
                     self.targetVisible=True
+                    self.hasTarget = True
                     dist = target.getBestCameraToTarget().translation().norm()
+                    area = target.getArea()
                     avg_dist=avg_dist+dist
+                    avg_area=avg_area+area                    
                     rawFid.append(target.getFiducialId())   # To Do - rewrite more concise 
-                    rawFid.append(0)  #txnc
-                    rawFid.append(0)  #tync
+                    rawFid.append(target.getYaw())  #txnc
+                    rawFid.append(target.getPitch())  #tync
                     rawFid.append(target.getArea())
-                    rawFid.append(dist)  
-                    rawFid.append(dist)
+                    rawFid.append(dist)  # dist to Cam
+                    rawFid.append(dist)  # dist to robot
                     rawFid.append(target.getPoseAmbiguity())
                     if dist<mindist:
                           mindist=dist
+                          minPitch = target.getPitch()
+                          minYaw = target.getYaw()                          
                           minID=target.getFiducialId()
+                          minArea = target.getArea()
                 
-                if length>0: avg_dist=avg_dist/length
+                if length>0: 
+                    avg_dist=avg_dist/length
+                    avg_area=avg_area/length
             
             if self.targetVisible:
                 estimatedRobotPose = self.photonEstimator.update(result)
+            
+            SmartDashboard.putNumber("PV hasTarget",self.hasTarget)
+            LimelightHelpers.set_tv(self.llLeftName, self.hasTarget)
+
 
             if (length>0 and not self.targetVisible) : 
-                SmartDashboard.putNumber("PV ID min",0)
-                SmartDashboard.putNumber("PV Dist min ",0)     
+                SmartDashboard.putNumber("PV ID near",0)
+                SmartDashboard.putNumber("PV Dist near ",0)     
                 SmartDashboard.putNumber("PV num Targets ",0)                                
             elif length>0 and self.targetVisible:
-                SmartDashboard.putNumber("PV ID min ",minID)
-                SmartDashboard.putNumber("PV Dist min ",mindist) 
-                SmartDashboard.putNumber("PV num Targets ",length)    
+                SmartDashboard.putNumber("PV ID near ",minID)
+                SmartDashboard.putNumber("PV Dist near ",mindist) 
+                SmartDashboard.putNumber("PV pitch near ",minPitch)                    
+                SmartDashboard.putNumber("PV Yaw near ",minYaw)   
+                SmartDashboard.putNumber("PV Area avg ",avg_area)                   
+                SmartDashboard.putNumber("PV Area near ",minArea)                                   
+                SmartDashboard.putNumber("PV num Targets ",length)                                                     
             
             if (estimatedRobotPose is not None) :
 # Put this back in if using PV for pose correction, comment out if using PV to drive LL in simulation                
@@ -116,8 +137,11 @@ class PVisionSim(Subsystem):
                     SmartDashboard.putNumber("PV pose R",estPose.rotation().radians() )                               
                     SmartDashboard.putNumber("PV Dist avg",avg_dist)    
                 
-                tv=True
-                LimelightHelpers.set_tv(self.llLeftName, tv)
+                LimelightHelpers.set_ty(self.llLeftName, minPitch) 
+                LimelightHelpers.set_tx(self.llLeftName, minYaw)                 
+                LimelightHelpers.set_tync(self.llLeftName, minPitch) 
+                LimelightHelpers.set_txnc(self.llLeftName, minYaw)                                 
+
                 LimelightHelpers.set_botpose_estimate_wpiblue_megatag2(
                     estimatedRobotPose.estimatedPose.toPose2d(),
                     result.getTimestampSeconds(),
@@ -125,14 +149,11 @@ class PVisionSim(Subsystem):
                     length,  #number of tags
                     avg_dist,  # tag span (the distance betweebn the two furthestr tags) 
                     avg_dist, #avg_tag_dist, 
-                    0, # avg_tag_area, 
+                    avg_area, # avg_tag_area, 
                     rawFid,   # list of LL raw fiducials
                     True, # is_megatag_2
                     self.llLeftName
                 )
-            else: 
-                tv=False
-                LimelightHelpers.set_tv(self.llLeftName, tv)
 
             
             

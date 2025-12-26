@@ -51,10 +51,12 @@ class MyRobot(commands2.TimedCommandRobot):
         pass
 
     def disabledPeriodic(self) -> None:
+        self.container.limelightSytem.zeroAndseedIMU()
         """This function is called periodically when disabled"""
         pass
 
     def autonomousInit(self) -> None:
+        self.container.limelightSytem.set_IMU_Mode(2)
         """This autonomous runs the autonomous command selected by your RobotContainer class."""
 
         
@@ -64,7 +66,6 @@ class MyRobot(commands2.TimedCommandRobot):
             self.autonomousCommand.schedule()
 
     def autonomousPeriodic(self) -> None:
-        """This function is called periodically during autonomous"""
         pass
 
     def teleopInit(self) -> None:
@@ -75,9 +76,9 @@ class MyRobot(commands2.TimedCommandRobot):
         if self.autonomousCommand:
             self.autonomousCommand.cancel()
         self.container.setHeadingControlToCurrentrHeading()
+        self.container.limelightSytem.set_IMU_Mode(2)
         
     def teleopPeriodic(self) -> None:
-        """This function is called periodically during operator control"""
         pass
 
     def testInit(self) -> None:

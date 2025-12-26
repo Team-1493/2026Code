@@ -986,23 +986,24 @@ class LimelightHelpers:
 
 
 	@staticmethod
-	def set_botpose_estimate(pose: Pose2d, timestamp, latency, tag_count, tag_span, tag_dist, 
-						  tag_area, raw_fiducials, is_megatag_2):
-		pe=PoseEstimate(
-			pose,
-			timestamp, latency, tag_count, tag_span, tag_dist, tag_area, raw_fiducials, is_megatag_2
-		)
-		
-
-	@staticmethod
 	def set_tv(limelight_name: str, value: float) -> bool:
-		"""
-		Does the Limelight have a valid target?
-		@param limelight_name Name of the Limelight camera ("" for default)
-		@return True if a valid target is present, false otherwise
-		"""
 		return 1.0 == LimelightHelpers.set_limelight_NTDouble(limelight_name, "tv",value)
 
+	@staticmethod
+	def set_tx(limelight_name: str, value: float) -> bool:
+		return 1.0 == LimelightHelpers.set_limelight_NTDouble(limelight_name, "tx",value)
+
+	@staticmethod
+	def set_ty(limelight_name: str, value: float) -> bool:
+		return 1.0 == LimelightHelpers.set_limelight_NTDouble(limelight_name, "ty",value)	
+
+	@staticmethod
+	def set_txnc(limelight_name: str, value: float) -> bool:
+		return 1.0 == LimelightHelpers.set_limelight_NTDouble(limelight_name, "txnc",value)
+	
+	@staticmethod
+	def set_tync(limelight_name: str, value: float) -> bool:
+		return 1.0 == LimelightHelpers.set_limelight_NTDouble(limelight_name, "tync",value)
 
 	@staticmethod
 	def set_botpose_estimate_wpiblue_megatag2(pose: Pose2d, timestamp, latency, tag_count, tag_span, tag_dist, 

@@ -92,14 +92,14 @@ class RobotContainer:
         self._joystick.button(3).onTrue(
             self.headingController.runOnce(lambda:self.headingController.rotateTo180()))
 
-        self._joystick.button(7).onTrue(
+        self._joystick.button(4).onTrue(
             self.headingController.runOnce(lambda:self.headingController.rotateTo270()))
 
         self.drivetrain.register_telemetry(
             lambda state: self._logger.telemeterize(state)
         )
 
-        self._joystick.button(4).whileTrue(
+        self._joystick.button(7).whileTrue(
             commands2.DeferredCommand(lambda:self.drivePath.drivePathToTag(2,-.5,.8)).finallyDo
             (self.headingController.setTargetRotationInt))
         
