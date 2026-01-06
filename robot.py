@@ -8,8 +8,8 @@
 import wpilib
 import commands2
 import typing
-from robotstate import RobotState
-from robotcontainer import RobotContainer
+from robot_state import RobotState
+from robot_container import RobotContainer
 
 
 class MyRobot(commands2.TimedCommandRobot):

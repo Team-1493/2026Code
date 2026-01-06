@@ -40,6 +40,8 @@ class Telemetry:
             Mechanism2d(1, 1),
             Mechanism2d(1, 1),
         ]
+        
+        
         # A direction and length changing ligament for speed representation
         self._module_speeds: list[MechanismLigament2d] = [
             self._module_mechanisms[0]
@@ -70,7 +72,7 @@ class Telemetry:
             .getRoot("RootDirection", 0.5, 0.5)
             .appendLigament("Direction", 0.1, 0, 0, Color8Bit(Color.kWhite)),
         ]
-
+        
         # Set up the module state Mechanism2d telemetry
         for i, module_mechanism in enumerate(self._module_mechanisms):
             SmartDashboard.putData(f"Module {i}", module_mechanism)
@@ -90,6 +92,7 @@ class Telemetry:
 
         # Also write to log file
         pose_array = [state.pose.x, state.pose.y, state.pose.rotation().degrees()]
+        
         module_states_array = []
         module_targets_array = []
         for i in range(4):
@@ -97,12 +100,13 @@ class Telemetry:
             module_states_array.append(state.module_states[i].speed)
             module_targets_array.append(state.module_targets[i].angle.radians())
             module_targets_array.append(state.module_targets[i].speed)
+        
 
         SignalLogger.write_double_array("DriveState/Pose", pose_array)
-        SignalLogger.write_double_array("DriveState/ModuleStates", module_states_array)
-        SignalLogger.write_double_array(
-            "DriveState/ModuleTargets", module_targets_array
-        )
+#        SignalLogger.write_double_array("DriveState/ModuleStates", module_states_array)
+#        SignalLogger.write_double_array(
+#            "DriveState/ModuleTargets", module_targets_array
+#        )
         SignalLogger.write_double(
             "DriveState/OdometryPeriod", state.odometry_period, "seconds"
         )
@@ -111,8 +115,10 @@ class Telemetry:
         self._field_type_pub.set("Field2d")
         self._field_pub.set(pose_array)
 
+        
         # Telemeterize each module state to a Mechanism2d
         for i, module_state in enumerate(state.module_states):
             self._module_speeds[i].setAngle(module_state.angle.degrees())
             self._module_directions[i].setAngle(module_state.angle.degrees())
             self._module_speeds[i].setLength(module_state.speed / (2 * self._max_speed))
+        

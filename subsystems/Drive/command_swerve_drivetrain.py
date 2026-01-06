@@ -1,14 +1,15 @@
 from commands2 import Command, Subsystem
 from commands2.sysid import SysIdRoutine
 import math
-from phoenix6 import SignalLogger, swerve, units, utils
+from phoenix6 import SignalLogger, swerve, units, utils, hardware
 from typing import Callable, overload
 from wpilib import DriverStation, Notifier, RobotController
 from wpilib.sysid import SysIdRoutineLog
 from wpimath.geometry import Pose2d, Rotation2d
 
 
-class CommandSwerveDrivetrain(Subsystem, swerve.SwerveDrivetrain):
+class CommandSwerveDrivetrain(Subsystem, swerve.SwerveDrivetrain[hardware.TalonFX, hardware.TalonFX, hardware.CANcoder]):
+
     """
     Class that extends the Phoenix 6 SwerveDrivetrain class and implements
     Subsystem so it can easily be used in command-based projects.
@@ -318,3 +319,4 @@ class CommandSwerveDrivetrain(Subsystem, swerve.SwerveDrivetrain):
         :type vision_measurement_std_devs:  tuple[float, float, float] | None
         """
         swerve.SwerveDrivetrain.add_vision_measurement(self, vision_robot_pose, utils.fpga_to_current_time(timestamp), vision_measurement_std_devs)
+               

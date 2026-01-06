@@ -30,7 +30,7 @@ class TunerConstants:
         .with_k_p(.1)
         .with_k_i(0)
         .with_k_d(0)
-        .with_k_s(0)
+        .with_k_s(.22)
         .with_k_v(0.124)
     )
 

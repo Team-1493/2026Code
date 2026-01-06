@@ -989,6 +989,11 @@ class LimelightHelpers:
 	def set_tv(limelight_name: str, value: float) -> bool:
 		return 1.0 == LimelightHelpers.set_limelight_NTDouble(limelight_name, "tv",value)
 
+
+	@staticmethod
+	def set_fiducialid_id(limelight_name: str, value: float) -> bool:
+		return LimelightHelpers.set_limelight_NTDouble(limelight_name, "tid",value)
+
 	@staticmethod
 	def set_tx(limelight_name: str, value: float) -> bool:
 		return 1.0 == LimelightHelpers.set_limelight_NTDouble(limelight_name, "tx",value)
